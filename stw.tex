@@ -32,7 +32,7 @@
 \DeclareMathOperator{\lhppw}{lhp-pw}
 
 
-\title{\MakeUppercase{Some Notes on Simple Treewidth}}
+\title{\MakeUppercase{Notes on Simple Treewidth}}
 \author{Vida Dujmović, Pat Morin, and David R. Wood}
 
 \newcommand{\trn}{\chi_2}
@@ -60,22 +60,45 @@
 
 \section{Introduction}
 
+Formalized by \citet{knauer.ueckerdt:simple} and studied thoroughly in the thesis of \citet{wulf:stacked} (under a different name), \emph{simple treewidth} is a more restrictive and less well-known variant of treewidth.\footnote{Though \citet{knauer.ueckerdt:simple} were the first to formalize a general definition, simple treewidth was used implicitly several times prior to this.}  Just as treewidth is related to $k$-trees, simple treewidth is related to \emph{simple $k$-trees}, which were defined and studied by \citet{markenzon.justel.ea:subclasses} (who call them Simple Clique (SC) $k$-trees).
+
+The purpose of the present note is to collect a few useful results about simple treewidth.  This is motivated by two instances \cite{X,Y} where simple treewidth served a helpful role, but basic properties of simple treewidth needed to be rediscovered (or at least verified) because these properties have not been documented (or proven) anywhere.  A glaring example of this is the fact that every graph of simple treewidth $k$ is a spanning subgraph of a simple $k$-tree.  The equivalent statement for treewidth and $k$-trees is very well-known and easy to prove. For simple treewidth, even the case $k=3$ is non-trivial \cite{kratochvil.vaner:note,elmallah.colbourn:on}.  For $k\ge 4$, the result can be deduced from a result (Theorem 3.27) in the thesis of \citet{wulf:stacked}, but we are unaware of any complete proof of (or explicit statement of) this fact for $k\ge 4$.  [TODO: Look more carefully at and around Theorem~3.27 in Wulf's thesis, which shows that every graph of simple treewidth $k$ is contained in some simple $k$-tree.]
+
+Indeed, some properties of treewidth and $k$-trees that are easy to establish are considerably more difficult to establish for simple treewidth or simple $k$-trees, and this discourages the use of simple treewidth, even when it is the appropriate parameter.  The authors hope that this note will help correct this by encouraging the use of simple treewidth in applications where it is appropriate, as doing so can lead to results that are more general.  For example, there are results that are true for graphs of treewidth 1 (trees) that are just as easy to prove for graphs of simple treewidth 2 (outerplanar graphs).  Proving them this way immediately gives a more general result.
+
+Finally, we emphasize that many of the results presented here are known. In cases where a proof of the result is available, we simply cite it.  For results stated without proof, we provide a proof, but reference the original statement of the result.  The remainder of the paper has two sections: \cref{treewidth} reviews definitions of treewidth and $k$-trees. \cref{simple-treewidth} defines simple treewidth, simple $k$-trees, and proves basic results about both these parameters.
+
+
+\section{Treewidth}
+\label{treewidth}
+
 A graph $H$ is a \emph{$t$-tree} if $H$ is a clique of size at most $t$ or if it contains a vertex $v$ such that $H[N_H(v)]$ is a $t$-clique and $H-\{t\}$ is a $t$-tree.  A \emph{$t$-forest} is a graph whose connected components are $t$-trees.
 
 The recursive definition of $t$-trees implies that there is a permutation $\mathcal{R}:=(v_1,\ldots,v_n)$ of $V(H)$ such that, for each $i\in\{1,\ldots,n\}$, $H[N_H(v_i)\cap \{v_1,\ldots,v_{i-1}\}]$ is a clique of size $\min\{t,i-1\}$.  We call $\mathcal{R}$ a \emph{construction order} for $H$.  A construction order $\mathcal{R}$ induces a total order on $H$ that we denote by $<_{\mathcal{R}}$.
 
-For two graphs $H$ and $X$, an \emph{$X$-decomposition} of $H$ is a sequence $\mathcal{X}:=(B_x:x\in V(X))$ of subsets of $V(H)$ called \emph{bags} indexed by the nodes of $X$ and such that
+A \emph{tree decomposition} of a graph $G$ is a sequence $\mathcal{T}:=(B_x:x\in V(T))$ of subsets of $V(G)$ called \emph{bags} indexed by the nodes of a tree $T$ such that
  \begin{inparaenum}[(i)]
-     \item for each $v\in V(H)$, $X[\{x\in V(X):v\in B_x\}]$ is connected; and
-     \item for each $vw\in E(H)$, there exists some $x\in V(X)$ such that $\{v,w\}\subseteq B_x$.
+     \item for each $v\in V(G)$, $T[\{x\in V(T):v\in B_x\}]$ is connected; and
+     \item for each $vw\in E(G)$, there exists some $x\in V(T)$ such that $\{v,w\}\subseteq B_x$.
 \end{inparaenum}
-The \emph{width} of $\mathcal{X}$ is $\max\{|B_x|:x\in V(X)\}-1$.
+The \emph{width} of $\mathcal{T}$ is $\max\{|B_x|:x\in V(T)\}-1$.  The \emph{treewidth}, $\tw(G)$ is the minimum integer $k$ such that $G$ has a tree decomposition of width $k$.
 
-In the special case where $X$ is a tree (or a forest), $\mathcal{X}$ is called a \emph{tree decomposition} of $H$.
+Property~(i) of tree decompositions says that each vertex of $G$ is associated with a (connected) subtree of $T$.  The following well-known lemma follows from the $1$-Helly property of subtrees:
+
+\begin{lem}
+\label{TreeDecompositionClique}
+    For each clique $C$ of a graph $G$, each tree decomposition $\mathcal{T}:=(B_x:x\in V(T))$ of $G$ has a bag $B_x\supseteq C$ containing $C$.
+\end{lem}
+
+
+[TODO: $H\Rightarrow G$ throughout and $t\Rightarrow k$ throughout.]
 
 It is not difficult to see that every $t$-tree $H$ has treewidth $t$ and a tree-decomposition of $H$ can be constructed incrementally from a construction order $v_1,\ldots,v_n$ of $H$: Start with a tree $T$ that consists of a single node $r$ with bag $B_r:=\{v_1,\ldots,v_{\min\{t+1,n\}}\}$ and, for $i\gets t+2,\ldots,n$, let $p_i$ be the minimum-depth node of $T$ such that $B_{p_i}$ contains the parent clique $N_H(v_i)\cap\{v_1,\ldots,v_{i-1}\}$ of $v_i$, and add a new leaf $x_i$ to $T$ adjacent to $p_i$ whose bag $B_{x_i}$ contains $v_i$ and its parent clique.  We call a tree-decomposition constructed this way a \emph{canonical} tree decomposition of $H$ generated by the construction order $v_1,\ldots,v_n$.
 
 By construction, every bag of a canonical tree decomposition $\mathcal{T}$ of a $t$-tree $H$ has size exactly $\min\{t+1,|H|\}$, $T$ is rooted at $r$ and, for each edge $xy\in E(T)$, $|B_x\setminus B_p|=1$.  Indeed, for any canonical tree decomposition of $H$, there is a bijection between the $(t+1)$-cliques of $H$ and the bags of the decomposition.
+
+A graph $G$ is \emph{chordal} if it has no induced cycle of length greater than 3.  It is well known that $G$ is chordal if and only if $V(G)$ has an ordering $v_1,\ldots,v_n$ such that, for each $i\in\{2,\ldots,n\}$, $G[N_G(v_i)\cap\{v_1,\ldots,v_{i-1}]$ is a clique.  Clearly any $t$-tree is chordal.  Building a canonical tree decomposition of $G$ using the ordering $v_1,\ldots,v_n$ proves one direction of the following well-known result (the other direction follows from a preorder traversal of $T$):
+
 % Note that this implies that $|V(T)|=\max\{1,n-t\}$.
 % , since $B_r$ contains $t+1$ vertices of $H$ and, for each $x\in V(T)\setminus\{r\}$, $B_x$ includes exactly one vertex of $H$ that is not in its parent $B_p$ where $p$ is the $T$-parent of $x$.
 % For a rooted tree decomposition $\mathcal{T}:=(B_x:x\in V(T))$ of a graph $H$ and any $v\in V(H)$, we use the notation $x_T(v)$ to denote the minimum $T$-depth node $x\in V(T)$ such that $v\in B_x$.  This induces a partial order $\prec_{\mathcal{T}}$ on $V(H)$ in which $v\prec_{\mathcal{T}} w$ if and only if $x_T(v)\prec_T x_T(w)$.
@@ -115,44 +138,54 @@ By construction, every bag of a canonical tree decomposition $\mathcal{T}$ of a 
 %     \label{up-clique-figure}
 % \end{figure}
 
+
+\begin{lem}
+\label{TreeDecompositionChordal}
+    A graph $G$ is chordal if and only if it has a tree-decomposition $\mathcal{T}:=(B_x:x\in V(T))$ in which $B_x$ is a clique in $G$ for each $x\in V(T))$.
+\end{lem}
+
+
 \subsection{Simple Treewidth}
+\label{simple-treewidth}
+
+A tree decomposition $\mathcal{T}:=(B_x:x\in V(T))$ of a graph $H$ is \emph{$t$-simple} if it has width at most $t$ and, for every $t$-element subset $S\subseteq V(H)$, $|\{x\in V(T):S\subseteq B_x\}|\le 2$.  The simple treewidth $\stw(H)$ of a graph $H$ is the minimum integer $t$ such that $H$ has a $t$-simple tree decomposition \cite{knauer.ueckerdt:simple}.  A $t$-tree $H$ is a \emph{simple} $t$-tree if its canonical tree decompositions are $t$-simple.\footnote{Although a simple $t$-tree $H$ has different canonical tree decompositions depending on the choice of $v_1,\ldots,v_t$ in the construction order, each of these tree decompositions $(B_x:x\in V(T))$ generates the same set $\{B_x:x\in V(T)\}$ of bags that have a bijection with the $t+1$ cliques of $H$.  Therefore all of these tree decompositions are $t$-simple or none of them are.}
 
 
-A tree decomposition $\mathcal{T}:=(B_x:x\in V(T))$ of a graph $H$ is \emph{$t$-simple} if it has width $t$ and, for every $t$-element subset $S\subseteq V(H)$, $|\{x\in V(T):S\subseteq B_x\}|\le 2$.  The simple treewidth $\stw(H)$ of a graph $H$ is the minimum integer $t$ such that $H$ has a $t$-simple tree decomposition \cite{knauer.ueckerdt:simple}.  A $t$-tree $H$ is a \emph{simple} $t$-tree if its canonical tree decompositions are $t$-simple.\footnote{Although a simple $t$-tree $H$ has different canonical tree decompositions depending on the choice of $v_1,\ldots,v_t$ in the construction order, each of these tree decompositions $(B_x:x\in V(T))$ generates the same set $\{B_x:x\in V(T)\}$ of bags that have a bijection with the $t+1$ cliques of $H$.  Therefore all of these tree decompositions are $t$-simple or none of them are.}  Though it appears implicitly, several times in the literature, \citet{knauer.ueckerdt:simple} define simple treewidth.  \citet{markenzon.justel.ea:subclasses} define simple $t$-trees (which they call Simple Clique (SC) $t$-trees).  Simple treewidth and treewidth are closely related:
-
-\begin{lem}\label{simple-treewidth-vs-treewidth}\cite{knauer.ueckerdt:simple}
+\begin{lem}[\cite{knauer.ueckerdt:simple}]\label{simple-treewidth-vs-treewidth}
     For every graph $G$, $\tw(G)\le \stw(G)\le \tw(G)+1$.
 \end{lem}
 
-Although \cref{simple-treewidth-vs-treewidth} suggests there is little difference between treewidth and simple treewidth, simple $t$-trees arise naturally in a number of settings:
+Although \cref{simple-treewidth-vs-treewidth} suggests there is little difference between treewidth and simple treewidth, simple $t$-trees arise naturally in a number of settings and are related to the Colin de Verdière number $\mu(H)$ of a graph $H$:
 
-\begin{lem}[\cite{knauer.ueckerdt:simple,markenzon.justel.ea:subclasses}]\label{simple-small-cases}
+\begin{lem}[\cite{knauer.ueckerdt:simple,markenzon.justel.ea:subclasses,fallat.mitchell:colin}]\label{simple-small-cases}
     A graph $H$ is
     \begin{compactenum}[(i)]
         \item a simple $1$-tree if and only if $H$ is a path.
         \item a simple $2$-tree if and only if $H$ is an edge-maximal outerplanar graph;
         \item a simple $3$-tree if and only if $H$ is a planar 3-tree.
+        \item a simple $4$-tree if and only if $H$ is a linkelessly embeddable 4-tree.
+        \item a simple $k$-tree if and only if $H$ is a $k$-tree and $\mu(H)=k$.
     \end{compactenum}
 \end{lem}
 
-In addition to being a natural property of some graph classes, simple treewidth has recently proven to be useful for establishing optimal bounds on some colouring problems \cite{bose.dujmovic.ea:asymptotically}.
+An extremely useful property of simple treewidth is that it is minor-monotone, a fact that is stated without proof by \citet{knauer.ueckerdt:simple}.  A complete proof is given by \citet[Theorem~5.2]{wulf:stacked}.
 
-Some properties of treewidth and $t$-trees that are easy to establish are considerably more difficult to establish for simple treewidth or simple $t$-trees.  One of these is that simple treewidth is a minor-closed, a fact that is stated without proof by \citet{knauer.ueckerdt:simple} and whose proof requires some case analysis.
+ % and whose proof requires some case analysis.
 
-\begin{lem}[\cite{knauer.ueckerdt:simple}]\label{simple-minor-closed}
+\begin{lem}[\cite{knauer.ueckerdt:simple,wulf:stacked}]\label{simple-minor-closed}
     For every graph $G$ and every minor $M$ of $G$, $\stw(M)\le\stw(G)$.
 \end{lem}
 
+The following is another example of a property that is easy to prove for treewidth but more difficult to establish for simple treewidth:
 
-Another example of a property that is easy to prove for treewidth but more difficult for simple treewidth is the following:  Every graph of treewidth at most $t$ is the spanning subgraph of some $t$-tree.  For simple treewidth, the case $t=2$ is well known: Every outerplanar graph is a spanning subgraph of some edge-maximal outerplanar graph.  The case $t=3$, which states that every planar graph of treewidth at most 3 is the spanning subgraph of some $3$-tree, was proven by \citet{kratochvil.vaner:note}, who note that it is also implicit in earlier work of \citet{elmallah.colbourn:on}.  We are unaware of any proof, or statement, of this for $t\ge 4$, so we give one here:
+ % is the following:  Every graph of treewidth at most $t$ is the spanning subgraph of some $t$-tree.  For simple treewidth, the case $t=2$ is well known: Every outerplanar graph is a spanning subgraph of some edge-maximal outerplanar graph.  The case $t=3$, which states that every planar graph of treewidth at most 3 is the spanning subgraph of some $3$-tree, was proven by \citet{kratochvil.vaner:note}, who note that it is also implicit in earlier work of \citet{elmallah.colbourn:on}.  We are unaware of any proof, or statement, of this for $t\ge 4$, so we give one here:
 
 \begin{lem}\label{simple-subgraph}
     For any graph $G$ with $\stw(G)\le t$, there exists a simple $t$-tree $H$ with $V(G)= V(H)$ and $E(G)\subseteq E(H)$.
 \end{lem}
 
 \begin{proof}
-    If $|G|\le t+1$, then the result is trivial, so suppose that $|G|>t+1$.
-    Let $\mathcal{T}:=(B_x:x\in V(T))$ be a $t$-simple tree decomposition of $G$.  We will transform $\mathcal{T}$ into a canonical decomposition of an encompassing simple $t$-tree $H$.  Each step of this transformation maintains $t$-simplicity, i.e., after each step, $\mathcal{T}$ is a $t$-simple tree decomposition of some graph that contains $G$.
+    If $|G|\le t+1$, then the result is trivial, so suppose that $|G|>t+1$. Let $\mathcal{T}:=(B_x:x\in V(T))$ be a $t$-simple tree decomposition of $G$. We will transform $\mathcal{T}$ into a canonical decomposition of an encompassing simple $t$-tree $H$. Each step of this transformation maintains $t$-simplicity, i.e., after each step, $\mathcal{T}$ is a $t$-simple tree decomposition of some graph that contains $G$.
 
     We say that a node $x\in V(T)$ is \emph{redundant} if it has a neighbour $y$ such that $B_x\subseteq B_y$.  We say that $\mathcal{T}$ is \emph{concise} if $T$ has no redundant nodes.  We may assume that $\mathcal{T}$ is concise since,  if $B_x\subseteq B_y$ for some $xy\in E(T)$ then we can contract $x$ into $y$ without affecting $t$-simplicity.  Repeating this exhaustively ensures that $\mathcal{T}$ is concise.
 
@@ -204,7 +237,6 @@ Another example of a property that is easy to prove for treewidth but more diffi
         \caption{Making $\mathcal{T}$ maximally deep.}
         \label{tough-one}
     \end{figure}
-
 
     If $|B_y|\le t$ then we add $v$ to $B_y$.  This operation increases the total bag size of $\mathcal{T}$, and this step is complete.  That this operation preserves $t$-simplicity follows from the non-existence of the path $xyz$ in the previous paragraph.  In particular, before this operation, the $t$-element subset $(B_x\cap B_y)\cup\{v\}$ appears only in $B_x$. After this operation, it appears only in $B_x$ and $B_y$.
 
@@ -265,8 +297,31 @@ Finally, a property of treewidth that is useful for induction \cite{kundgen.pels
 \end{lem}
 
 \begin{proof}
-    Delete BFS layers $L_{i+1},\ldots,L_m$ and contract BFS layers $L_0,\ldots,L_{i-1}$ into a single vertex $v_0$ to obtain a minor $H'$ of $H$ in which $v_0$ is a dominant vertex.  By \cref{simple-minor-closed}, $\stw(H')\le t$, so $H'$ has a $t$-simple tree decomposition $\mathcal{T}':=(B_x:x\in V(T))$.  Since $v_0$ is a dominant vertex, $v_0$ appears in every bag of $\mathcal{T}'$.  Therefore $\mathcal{T}:=(B_x\setminus\{v_0\}:x\in V(T))$ is a $(t-1)$-simple tree decomposition of $H'-\{v_0\}=H[L_i]$.
+    Delete BFS layers $L_{i+1},\ldots,L_m$ and contract BFS layers $L_0,\ldots,L_{i-1}$ into a single vertex $v_0$ to obtain a minor $H'$ of $H$ in which $v_0$ is a dominant vertex.  By \cref{simple-minor-closed}, $\stw(H')\le t$, so $H'$ has a $t$-simple tree decomposition $(B_x:x\in V(T))$.
+
+    Now, let $T'$ be obtained by removing each node $x\in V(T)$ such that $v_0\not\in B_x$ and let $\mathcal{T}':=(B_x':x\in V(T'))$, where $B_x':=B_x\setminus\{v_0\}$.  We claim that $\mathcal{T}'$ is a $(t-1)$-simple tree decomposition of $H[L_i]$.  Clearly, the width of $\mathcal{T}'$ is at most $t-1$.  $\mathcal{T}'$ is also $(t-1)$-simple since, for any distinct triple $x,y,z\in V(T')$, $|B_x\cap B_y\cap B_z|<t$ and $v_0\in B_x\cap B_y\cap B_z$, so $|B_x'\cap B_y'\cap B_z'\setminus\{v_0\}|<t-1$.
+
+    All that remains is to verify that $\mathcal{T}'$ is, indeed, a  tree decomposition of $H[L_i]$.  Property (i) of tree decompositions (connectivity of subtrees) follows immediately from property (i) of $\mathcal{T}$.  Finally, property (ii) is satisfied since, for any edge $vw\in E(H[L_i])$, the vertices $v_0,v,w$ form a clique in $H'$ so, by \cref{TreeDecompositionClique}, there is a node $x\in V(T)$ such that $\{v_0,v,w\}\subseteq B_x$ and therefore $x\in V(T')$ so $\{v,w\}\subseteq B_x'$.
 \end{proof}
+
+
+Next we describe a characterization of simple treewidth in terms of subgraphs. Let $W_k$ be the graph with vertex set $\{u,v,w,x_1,\dots,x_k\}$, where each of
+$\{u,x_1,\dots,x_k\}$, $\{v,x_1,\dots,x_k\}$ and $\{w,x_1,\dots,x_k\}$ are cliques.
+
+\begin{lem}
+\label{SimpleTreewidthChordal}
+    A graph $G$ has simple treewidth at most $k$ if and only if $G$ is a subgraph of a chordal graph containing no $K_{k+2}$ or $W_k$ subgraph.
+\end{lem}
+
+\begin{proof}
+    In every tree-decomposition of $W_k$ with width $k$, there are three distinct bags containing $\{u,x_1,\dots,x_k\}$, $\{v,x_1,\dots,x_k\}$ and $\{w,x_1,\dots,x_k\}$. Such a tree-decomposition is not $k$-simple. Thus $\stw(W_k)>k$.
+
+    Now consider a graph $G$ with simple treewidth at most $k$ and let $\mathcal{T}:=(B_x:x\in V(T))$ be a $t$-simple tree decomposition of $G$. Let $G'$ be the graph obtained from $G$ by adding an edge between any two non-adjacent vertices in a common bag $B_x$, i.e., $V(G'):=V(G)$, $E(G'):=\bigcup_{x\in V(T)}\{vw: v,w\in B_x,\, v\neq w\}$. Observe that $\mathcal{T}$ is also a $k$-simple tree-decomposition of $G'$, so $\stw(G')\leq k$. By \cref{TreeDecompositionChordal}, $G'$ is chordal, and $W_k\not\subseteq G'$ since $\stw(W_k)>k$. By \cref{TreeDecompositionClique}, $K_{k+2}\not\subseteq G'$.
+
+    We now prove that if $G$ is a subgraph of a chordal graph with no $K_{k+2}$ or $W_k$ subgraph, then $\stw(G)\leq k$. It suffices to prove the result when $G$ is chordal with no $K_{k+2}$ or $W_k$ subgraph. Let $\{X_i:i\in I\}$ be the maximal cliques of $G$. Let $T$ be the graph with vertex-set $I$, where $ij\in E(T)$ if and only if $X_i\cap X_j\neq\emptyset$ and $i\neq j$. It is well-known that $T$ is a tree and $(X_i:i\in V(T))$ is a tree-decomposition of $G$ (since $G$ is chordal). Since $K_{k+2}\not\subseteq G$, the width is at most $k$. If some set $X$ of $k$ vertices appears in distinct bags $X_a,X_b,X_c$, then $X_a\cup X_b\cup X_c$ induce $W_k$. Thus $(X_i:i\in V(T))$ is a $k$-simple tree-decomposition of $G$, and $\stw(G)\leq k$.
+\end{proof}
+
+[TODO: Add Wulf's characterization of $t$-trees in terms of excluded minors.]
 
 
 \bibliographystyle{plainnat}
